@@ -71,5 +71,10 @@ namespace AnilKumarOtte_Assignment
                                 
 
         }
+        [TearDown]
+        public void teardown()
+        {
+            driver.Quit();
+        }
     }
 }
