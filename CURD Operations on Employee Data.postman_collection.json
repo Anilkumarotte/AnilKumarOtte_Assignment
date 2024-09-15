@@ -1,0 +1,316 @@
+{
+	"info": {
+		"_postman_id": "7593b422-beec-4c70-a7a7-a50868772916",
+		"name": "CURD Operations on Employee Data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25180514",
+		"_collection_link": "https://www.postman.com/gold-rocket-247826/anilkumarotte/collection/jebdqn9/curd-operations-on-employee-data?action=share&source=collection_link&creator=25180514"
+	},
+	"item": [
+		{
+			"name": "Get All employees",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body\r",
+							"let response = pm.response.json();\r",
+							"\r",
+							"// Validate the status of the response\r",
+							"pm.test(\"Status is success\", function () {\r",
+							"    pm.expect(response.status).to.eql(\"success\");\r",
+							"});\r",
+							"\r",
+							"// Check if all records have been fetched\r",
+							"pm.test(\"Message contains success\", function () {\r",
+							"    pm.expect(response.message).to.eql(\"Successfully! All records has been fetched.\");\r",
+							"});\r",
+							"\r",
+							"// Validate the employee data\r",
+							"pm.test(\"Employee data is present and correct\", function () {\r",
+							"    pm.expect(response.data).to.be.an(\"array\").that.is.not.empty;\r",
+							"    response.data.forEach(employee => {\r",
+							"        pm.expect(employee).to.have.property(\"id\").that.is.a(\"number\");\r",
+							"        pm.expect(employee).to.have.property(\"employee_name\").that.is.a(\"string\");\r",
+							"        pm.expect(employee).to.have.property(\"employee_salary\").that.is.a(\"number\");\r",
+							"        pm.expect(employee).to.have.property(\"employee_age\").that.is.a(\"number\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"// Extract specific data for future requests (like employee id)\r",
+							"let firstEmployee = response.data[0];\r",
+							"pm.environment.set(\"employee_id\", firstEmployee.id);\r",
+							"pm.environment.set(\"employee_name\", firstEmployee.employee_name);\r",
+							"\r",
+							"// Check for any missing profile images\r",
+							"pm.test(\"Profile images are optional\", function () {\r",
+							"    let missingImages = response.data.filter(emp => !emp.profile_image);\r",
+							"    pm.expect(missingImages.length).to.be.above(0); // All employees have empty profile_image in the provided data\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"Url\", \"https://dummy.restapiexample.com/api/v1\")"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Url}}/employees",
+					"host": [
+						"{{Url}}"
+					],
+					"path": [
+						"employees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get By id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body\r",
+							"let response = pm.response.json();\r",
+							"\r",
+							"// Check if the status is 'success'\r",
+							"pm.test(\"Status is success\", function () {\r",
+							"    pm.expect(response.status).to.eql(\"success\");\r",
+							"});\r",
+							"\r",
+							"// Validate that data contains the required employee details\r",
+							"pm.test(\"Employee data contains all necessary fields\", function () {\r",
+							"    pm.expect(response.data).to.have.property(\"id\").that.is.a(\"number\");\r",
+							"    pm.expect(response.data).to.have.property(\"employee_name\").that.is.a(\"string\");\r",
+							"    pm.expect(response.data).to.have.property(\"employee_salary\").that.is.a(\"number\");\r",
+							"    pm.expect(response.data).to.have.property(\"employee_age\").that.is.a(\"number\");\r",
+							"    pm.expect(response.data).to.have.property(\"profile_image\").that.is.a(\"string\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Url}}/employee/1",
+					"host": [
+						"{{Url}}"
+					],
+					"path": [
+						"employee",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Creating an employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body\r",
+							"let response = pm.response.json();\r",
+							"\r",
+							"// Check if the status is 'success'\r",
+							"pm.test(\"Status is success\", function () {\r",
+							"    pm.expect(response.status).to.eql(\"success\");\r",
+							"});\r",
+							"\r",
+							"// Validate the message\r",
+							"pm.test(\"Message confirms successful addition\", function () {\r",
+							"    pm.expect(response.message).to.eql(\"Successfully! Record has been added.\");\r",
+							"});\r",
+							"\r",
+							"// Validate the structure of the created employee data\r",
+							"pm.test(\"Employee data is present and correct\", function () {\r",
+							"    pm.expect(response.data).to.have.property(\"name\").that.is.a(\"string\");\r",
+							"    pm.expect(response.data).to.have.property(\"salary\").that.is.a(\"string\");\r",
+							"    pm.expect(response.data).to.have.property(\"age\").that.is.a(\"string\");\r",
+							"    pm.expect(response.data).to.have.property(\"id\").that.is.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"// Check if the created employee has a valid id\r",
+							"pm.test(\"Employee ID is valid\", function () {\r",
+							"    pm.expect(response.data.id).to.be.a(\"number\").that.is.above(0);  // ID should be a positive number\r",
+							"});\r",
+							"pm.test(\"Employee name matches input\", function () {\r",
+							"    pm.expect(response.data.name).to.eql(\"test\");\r",
+							"});\r",
+							"pm.test(\"Salary and age are correct\", function () {\r",
+							"    pm.expect(response.data.salary).to.eql(\"123\");\r",
+							"    pm.expect(response.data.age).to.eql(\"23\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\t{\"name\":\"test\",\"salary\":\"123\",\"age\":\"23\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Url}}/create",
+					"host": [
+						"{{Url}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updating the employee details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"// Check if the status is 'success'\r",
+							"pm.test(\"Status is success\", function () {\r",
+							"    pm.expect(response.status).to.eql(\"success\");\r",
+							"});\r",
+							"\r",
+							"// Validate the message\r",
+							"pm.test(\"Message confirms successful addition\", function () {\r",
+							"    pm.expect(response.message).to.eql(\"Successfully! Record has been updated.\");\r",
+							"});\r",
+							"\r",
+							"// Validate the structure of the created employee data\r",
+							"pm.test(\"Employee data is present and correct\", function () {\r",
+							"    pm.expect(response.data).to.have.property(\"name\").that.is.a(\"string\");\r",
+							"    pm.expect(response.data).to.have.property(\"salary\").that.is.a(\"string\");\r",
+							"    pm.expect(response.data).to.have.property(\"age\").that.is.a(\"string\");\r",
+							"    \r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\":\"test1\",\"salary\":\"12345\",\"age\":\"23\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Url}}/update/21",
+					"host": [
+						"{{Url}}"
+					],
+					"path": [
+						"update",
+						"21"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleting the employee record",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"// Check if the status is 'success'\r",
+							"pm.test(\"Status is success\", function () {\r",
+							"    pm.expect(response.status).to.eql(\"success\");\r",
+							"});\r",
+							"\r",
+							"// Validate the message for successful deletion\r",
+							"pm.test(\"Message confirms successful deletion\", function () {\r",
+							"    pm.expect(response.message).to.eql(\"Successfully! Record has been deleted\");\r",
+							"});\r",
+							"\r",
+							"// Validate that the 'data' contains the ID of the deleted record\r",
+							"pm.test(\"Deleted record ID is present\", function () {\r",
+							"    pm.expect(response.data).to.be.a(\"string\");\r",
+							"    pm.expect(parseInt(response.data)).to.be.a(\"number\").that.is.above(0); // ID should be a positive number\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Url}}/delete/2",
+					"host": [
+						"{{Url}}"
+					],
+					"path": [
+						"delete",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "Url",
+			"value": ""
+		}
+	]
+}
